@@ -228,7 +228,7 @@ module Toto
 
     def load
       data = if @obj.is_a? String
-        meta, self[:body] = File.read(@obj).split(/\n\n/, 2)
+        meta, self[:body] = File.read(add_leading_zeros(@obj)).split(/\n\n/, 2)
 
         # use the date from the filename, or else toto won't find the article
         @obj =~ /\/(\d{4}-\d{2}-\d{2})[^\/]*$/
@@ -249,7 +249,11 @@ module Toto
     end
 
     def slug
-      self[:slug] || self[:title].slugize
+      self[:slug] || replace_period_with_dash(self[:title]).slugize
+    end
+
+    def replace_period_with_dash(title)
+      title.gsub(/(\.)/, '-')
     end
 
     def summary length = nil
@@ -272,7 +276,17 @@ module Toto
     end
 
     def path
-      "/#{@config[:prefix]}#{self[:date].strftime("/%Y/%m/%d/#{slug}/")}".squeeze('/')
+      "/#{@config[:prefix]}#{remove_leading_zeros(self[:date].strftime("/%Y/%m/%d/#{slug}"))}".squeeze('/').squeeze('-')
+    end
+
+    def remove_leading_zeros(date_path)
+      date_path.gsub!(/^\/(\d{4})\/0(\d)\/(.*)/, '/\1/\2/\3')
+      date_path.gsub(/^\/(\d{4})\/(\d{1,2})\/0(\d)\/(.*)/, '/\1/\2/\3/\4')
+    end
+
+    def add_leading_zeros(date_path)
+      date_path.gsub!(/\/(\d{4})-(\d{1})-(.*)/, '/\1-0\2-\3')
+      date_path.gsub(/\/(\d{4})-(\d{2})-(\d{1})-(.*)/, '/\1-\2-0\3-\4')
     end
 
     def title()   self[:title] || "an article"               end
@@ -355,4 +369,5 @@ module Toto
     end
   end
 end
+
 

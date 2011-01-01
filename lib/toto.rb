@@ -276,7 +276,11 @@ module Toto
     end
 
     def path
-      "/#{@config[:prefix]}#{remove_leading_zeros(self[:date].strftime("/%Y/%m/%d/#{slug}"))}".squeeze('/').squeeze('-')
+      if self[:url]
+        self[:url]
+      else
+        "/#{@config[:prefix]}#{remove_leading_zeros(self[:date].strftime("/%Y/%m/%d/#{slug}"))}".squeeze('/').squeeze('-')
+      end
     end
 
     def remove_leading_zeros(date_path)

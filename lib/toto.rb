@@ -78,7 +78,7 @@ module Toto
       end}.merge archives
     end
 
-    def archives filter = ""
+    def archives filter = "", tag = nil
       entries = ! self.articles.empty??
         self.articles.select do |a|
           filter !~ /^\d{4}/ || File.basename(a) =~ /^#{filter}/
@@ -86,7 +86,15 @@ module Toto
           Article.new article, @config
         end : []
 
-      return :archives => Archives.new(entries, @config)
+      if tag.nil?
+        { :archives => Archives.new(entries, @config) }
+      else
+        tagged = entries.select do |article|
+          article_tag = article[:tag]
+          article_tag && article_tag.slugize == tag
+        end
+        { :tag => tagged.first[:tag], :archives => tagged } if tagged.size > 0
+      end
     end
 
     def article route
@@ -105,13 +113,19 @@ module Toto
       end
 
       body, status = if Context.new.respond_to?(:"to_#{type}")
-        if route.first =~ /\d{4}/
+        if route.first =~ /^\d{4}$/
           case route.size
             when 1..3
               context[archives(route * '-'), :archives]
             when 4
               context[article(route), :article]
             else http 400
+          end
+        elsif route.first =~ /^tags/
+          if route[1].nil? || (data = archives('', route[1])).nil?
+            http 404
+          else
+            context[data, :tags]
           end
         elsif respond_to?(path)
           context[send(path, type), path.to_sym]
@@ -351,7 +365,7 @@ module Toto
       return [400, {}, []] unless @request.get?
 
       path, mime = @request.path_info.split('.')
-      route = (path || '/').split('/').reject {|i| i.empty? }
+      route = (@config[:alias_for].call(path) || '/').split('/').reject {|i| i.empty? }
 
       response = @site.go(route, env, *(mime ? mime : []))
 

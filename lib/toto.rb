@@ -127,6 +127,15 @@ module Toto
           else
             context[data, :tags]
           end
+        elsif route[0] == 'codepath' && route[1] == '1' && route[2] == 'pages' && !route[3].nil?
+          code_path_index = route[3].to_i
+          if (1..29).include?(code_path_index) && type == :html
+            code_path_article = Article.new("#{Paths[:articles]}/codepath/1/pages/#{code_path_index}.html", @config).load
+            code_path_article.merge!({:code_path_index => code_path_index, :code_path_count => 29})
+            context[code_path_article, :codepath]
+          else
+            http 404
+          end
         elsif respond_to?(path)
           context[send(path, type), path.to_sym]
         elsif (repo = @config[:github][:repos].grep(/#{path}/).first) &&

@@ -4,6 +4,7 @@ require 'erb'
 require 'rack'
 require 'digest'
 require 'open-uri'
+require 'coderay'
 
 if RUBY_PLATFORM =~ /win32/
   require 'maruku'
@@ -37,6 +38,17 @@ module Toto
     def to_html page, config, &blk
       path = ([:layout, :repo].include?(page) ? Paths[:templates] : Paths[:pages])
       config[:to_html].call(path, page, binding)
+    end
+
+    def highlight_code text
+      markdown(text).gsub(/<pre type="(.*?)">(.*?)<\/pre>/m) do |code|
+        if $1 == 'console'
+          type = nil
+        else
+          type = $1.to_sym
+        end
+        CodeRay.scan($2, type).html(:wrap => :div, :bold_every => false, :line_numbers => false, :css => :class)
+      end
     end
 
     def markdown text
@@ -291,7 +303,7 @@ module Toto
     alias :permalink url
 
     def body
-      markdown self[:body].sub(@config[:summary][:delim], '') rescue markdown self[:body]
+      highlight_code self[:body].sub(@config[:summary][:delim], '') rescue highlight_code self[:body]
     end
 
     def path

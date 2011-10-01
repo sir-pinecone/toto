@@ -47,7 +47,13 @@ module Toto
         else
           type = $1.to_sym
         end
-        CodeRay.scan($2, type).html(:wrap => :div, :bold_every => false, :line_numbers => false, :css => :class)
+        substitute_additional_colors CodeRay.scan($2, type).html(:wrap => :div, :bold_every => false, :line_numbers => false, :css => :class)
+      end
+    end
+
+    def substitute_additional_colors(code)
+      code.gsub(/\{([^\:]*)\:([^\{]*)\}/m) do |code|
+        "<span class='#{$1}'>#{$2}</span>"
       end
     end
 

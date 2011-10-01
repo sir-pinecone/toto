@@ -52,7 +52,7 @@ module Toto
     end
 
     def substitute_additional_colors(code)
-      code.gsub(/\{([^\:]*)\:([^\{]*)\}/m) do |code|
+      code.gsub(/\{\^([^\:]*)\:([^\{]*)\^\}/m) do |code|
         "<span class='#{$1}'>#{$2}</span>"
       end
     end

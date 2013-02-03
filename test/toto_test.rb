@@ -55,7 +55,7 @@ context Toto do
   end
 
   context "GET a single article" do
-    setup { @toto.get("/1900/05/17/the-wonderful-wizard-of-oz") }
+    setup { @toto.get("/1990/05/17/the-wonderful-wizard-of-oz") }
     asserts("returns a 200")                { topic.status }.equals 200
     asserts("content type is set properly") { topic.content_type }.equals "text/html"
     should("contain the article")           { topic.body }.includes_html("p" => /<em>Once upon a time<\/em>/)
@@ -153,12 +153,12 @@ context Toto do
 
       should("have a title")               { topic.title }.equals "Toto & The Wizard of Oz."
       should("parse the body as markdown") { topic.body }.equals "<h1>Chapter I</h1>\n\n<p>hello, <em>stranger</em>.</p>\n"
-      should("create an appropriate slug") { topic.slug }.equals "toto-and-the-wizard-of-oz"
+      should("create an appropriate slug") { topic.slug }.equals "toto-and-the-wizard-of-oz-"
       should("set the date")               { topic.date }.equals "the time is #{Date.today.strftime("%Y/%m/%d %H:%M")}"
       should("create a summary")           { topic.summary == topic.body }
       should("have an author")             { topic.author }.equals AUTHOR
-      should("have a path")                { topic.path }.equals Date.today.strftime("/%Y/%m/%d/toto-and-the-wizard-of-oz/")
-      should("have a url")                 { topic.url }.equals Date.today.strftime("#{URL}/%Y/%m/%d/toto-and-the-wizard-of-oz/")
+      should("have a path")                { topic.path }.equals Date.today.strftime("/%Y/%m/%d/toto-and-the-wizard-of-oz-").gsub(/\/0(\d)\//, '/\1/')
+      should("have a url")                 { topic.url }.equals Date.today.strftime("#{URL}/%Y/%m/%d/toto-and-the-wizard-of-oz-").gsub(/\/0(\d)\//, '/\1/')
     end
 
     context "with a user-defined summary" do
@@ -213,7 +213,7 @@ context Toto do
           }, conf)
         end
 
-        should("be in the directory") { topic.path }.equals Date.today.strftime("/blog/%Y/%m/%d/toto-and-the-wizard-of-oz/")
+        should("be in the directory") { topic.path }.equals Date.today.strftime("/blog/%Y/%m/%d/toto-and-the-wizard-of-oz-").gsub(/\/0(\d)\//, '/\1/')
       end
 
       context "with explicit leading forward slash" do
@@ -226,7 +226,7 @@ context Toto do
           }, conf)
         end
 
-        should("be in the directory") { topic.path }.equals Date.today.strftime("/blog/%Y/%m/%d/toto-and-the-wizard-of-oz/")
+        should("be in the directory") { topic.path }.equals Date.today.strftime("/blog/%Y/%m/%d/toto-and-the-wizard-of-oz-").gsub(/\/0(\d)\//, '/\1/')
       end
 
       context "with explicit trailing forward slash" do
@@ -239,7 +239,7 @@ context Toto do
           }, conf)
         end
 
-        should("be in the directory") { topic.path }.equals Date.today.strftime("/blog/%Y/%m/%d/toto-and-the-wizard-of-oz/")
+        should("be in the directory") { topic.path }.equals Date.today.strftime("/blog/%Y/%m/%d/toto-and-the-wizard-of-oz-").gsub(/\/0(\d)\//, '/\1/')
       end
     end
   end

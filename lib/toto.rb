@@ -109,9 +109,9 @@ module Toto
       else
         tagged = entries.select do |article|
           article_tags = article[:tags]
-          article_tags && article_tags.split(',').map { |t| t.strip.slugize }.include?(tag)
+          article_tags && article_tags.map(&:slugize).include?(tag)
         end
-        tag_name = !tagged.empty? && tagged.first[:tags].split(',').map(&:strip).select { |t| t.slugize == tag }
+        tag_name = !tagged.empty? && tagged.first[:tags].select { |t| t.slugize == tag }
         { :tag => tag_name, :archives => tagged } if tagged.size > 0
       end
     end
@@ -282,6 +282,8 @@ module Toto
       self.taint
       self.update data
       self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
+      # convert tags comma-separated list into an array
+      self[:tags] = self[:tags] && self[:tags].split(',').map(&:strip)
       self
     end
 

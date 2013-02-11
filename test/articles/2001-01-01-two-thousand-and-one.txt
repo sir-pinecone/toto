@@ -1,6 +1,6 @@
 title: the wizard of oz
 date: 12/10/1932
-tag: The Wizard of Oz
+tags: Thousands, The Wizard of Oz
 
 Once upon a time...
 

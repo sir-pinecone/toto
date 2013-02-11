@@ -1,4 +1,6 @@
 <h1 id="tag">Articles about <%= tag %></h1>
-<% for entry in archives %>
-  <li class="entry"><%= entry.title %></li>
-<% end %>
+<ul>
+  <% for entry in archives %>
+    <li class="entry"><%= entry.title %></li>
+  <% end %>
+</ul>

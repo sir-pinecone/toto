@@ -90,6 +90,14 @@ context Toto do
     should("return the custom error") { topic.body }.equals "error: 404"
   end
 
+  context "GET a tag page" do
+    setup { @toto.get('/tags/the-wizard-of-oz') }
+    asserts("returns a 200")                         { topic.status }.equals 200
+    asserts("body is not empty")                     { not topic.body.empty? }
+    should("includes only the entries for that tag") { topic.body }.includes_elements("li.entry", 2)
+    should("has access to @tag")                     { topic.body }.includes_html("#tag" => /The Wizard of Oz/)
+  end
+
   context "Request is invalid" do
     setup { @toto.delete('/invalid') }
     should("returns a 400") { topic.status }.equals 400
@@ -281,5 +289,3 @@ context Toto do
     should("respond to iso8601") { Date.today }.respond_to?(:iso8601)
   end
 end
-
-

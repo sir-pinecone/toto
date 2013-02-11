@@ -98,6 +98,11 @@ context Toto do
     should("has access to @tag")                     { topic.body }.includes_html("#tag" => /The Wizard of Oz/)
   end
 
+  context "GET a tag page that does not exist" do
+    setup { @toto.get('/tags/no-such-tag') }
+    should("returns a 404") { topic.status }.equals 404
+  end
+
   context "Request is invalid" do
     setup { @toto.delete('/invalid') }
     should("returns a 400") { topic.status }.equals 400

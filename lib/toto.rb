@@ -5,13 +5,7 @@ require 'rack'
 require 'digest'
 require 'open-uri'
 require 'coderay'
-
-if RUBY_PLATFORM =~ /win32/
-  require 'maruku'
-  Markdown = Maruku
-else
-  require 'rdiscount'
-end
+require 'rdiscount'
 
 require 'builder'
 

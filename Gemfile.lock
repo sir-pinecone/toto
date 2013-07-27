@@ -4,6 +4,7 @@ PATH
     toto (0.4.9)
       builder
       coderay (= 0.9.8)
+      haml
       rack
       rdiscount
 
@@ -12,11 +13,14 @@ GEM
   specs:
     builder (3.2.2)
     coderay (0.9.8)
+    haml (4.0.3)
+      tilt
     rack (1.5.2)
     rdiscount (2.1.6)
     riot (0.12.6)
       rr
     rr (1.1.1)
+    tilt (1.4.1)
 
 PLATFORMS
   ruby

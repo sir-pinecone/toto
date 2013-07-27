@@ -55,29 +55,12 @@ Gem::Specification.new do |s|
      "test/toto_test.rb"
   ]
 
-  if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
-    s.specification_version = 3
+  s.add_development_dependency "riot"
 
-    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_development_dependency(%q<riot>, [">= 0"])
-      s.add_runtime_dependency(%q<builder>, [">= 0"])
-      s.add_runtime_dependency(%q<rack>, [">= 0"])
-      s.add_runtime_dependency(%q<rdiscount>, [">= 0"])
-      s.add_runtime_dependency(%q<coderay>, ["= 0.9.8"])
-    else
-      s.add_dependency(%q<riot>, [">= 0"])
-      s.add_dependency(%q<builder>, [">= 0"])
-      s.add_dependency(%q<rack>, [">= 0"])
-      s.add_dependency(%q<rdiscount>, [">= 0"])
-      s.add_dependency(%q<coderay>, ["= 0.9.8"])
-    end
-  else
-    s.add_dependency(%q<riot>, [">= 0"])
-    s.add_dependency(%q<builder>, [">= 0"])
-    s.add_dependency(%q<rack>, [">= 0"])
-    s.add_dependency(%q<rdiscount>, [">= 0"])
-    s.add_dependency(%q<coderay>, ["= 0.9.8"])
-  end
+  s.add_dependency "builder"
+  s.add_dependency "rack"
+  s.add_dependency "rdiscount"
+  s.add_dependency "coderay", "= 0.9.8"
+  s.add_dependency "haml"
 end
 

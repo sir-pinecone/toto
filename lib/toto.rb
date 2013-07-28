@@ -201,8 +201,23 @@ module Toto
       end
 
       def render page, type
-        content = to_html page, @config
-        type == :html ? to_html(:layout, @config, &Proc.new { content }) : send(:"to_#{type}", page)
+        if type == :partial
+          to_partial page
+        else
+          content = to_html page, @config
+          if type == :html
+            to_html(:layout, @config, &Proc.new { content })
+          else
+            send(:"to_#{type}", page)
+          end
+        end
+      end
+
+      def to_partial page
+        if !page.start_with? '_'
+          page = '_' << page
+        end
+        to_html page, @config
       end
 
       def to_xml page

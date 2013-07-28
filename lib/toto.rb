@@ -41,7 +41,7 @@ module Toto
         else
           type = $1.to_sym
         end
-        substitute_additional_colors CodeRay.scan($2, type).html(:wrap => :div, :bold_every => false, :line_numbers => false, :css => :class)
+        substitute_additional_colors CodeRay.scan($2, type).html(:wrap => :div, :bold_every => false, :line_numbers => :inline, :css => :style)
       end
     end
 
@@ -291,8 +291,7 @@ module Toto
       self.taint
       self.update data
       self[:date] = Date.parse(self[:date].gsub('/', '-')) rescue Date.today
-      # convert tags comma-separated list into an array
-      self[:tags] = self[:tags] && self[:tags].split(',').map(&:strip)
+      convert_tags
       self
     end
 
@@ -367,6 +366,12 @@ module Toto
     def author()  self[:author] || @config[:author]          end
     def to_html() self.load; super(:article, @config)        end
     alias :to_s to_html
+
+    private
+
+    def convert_tags
+      self[:tags] = self[:tags] && self[:tags].split(',').map(&:strip)
+    end
   end
 
   class Config < Hash

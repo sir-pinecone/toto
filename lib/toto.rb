@@ -1,6 +1,6 @@
 require 'yaml'
 require 'date'
-require 'erb'
+require 'haml'
 require 'rack'
 require 'digest'
 require 'open-uri'
@@ -349,10 +349,10 @@ module Toto
       :cache => 28800,                                      # cache duration (seconds)
       :github => {:user => "", :repos => [], :ext => 'md'}, # Github username and list of repos
       :to_html => lambda {|path, page, ctx|                 # returns an html, from a path & context
-        ERB.new(File.read("#{path}/#{page}.rhtml")).result(ctx)
+        ::Haml::Engine.new(File.read("#{path}/#{page}.haml"), :format => :html5, :ugly => true).render(ctx)
       },
       :error => lambda {|code|                              # The HTML for your error page
-        "<font style='font-size:300%'>toto, we're not in Kansas anymore (#{code})</font>"
+        ::Haml::Engine.new(File.read("templates/pages/#{code}.haml"), :format => :html5, :ugly => true).render(@context)
       }
     }
     def initialize obj

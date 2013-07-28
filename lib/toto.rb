@@ -361,7 +361,17 @@ module Toto
       date_path.gsub(/\/(\d{4})-(\d{2})-(\d{1})-(.*)/, '/\1-\2-0\3-\4')
     end
 
-    def title()   self[:title] || "an article"               end
+    def title()
+      self[:title] || "Needs a title..."
+    end
+
+    # Returns both the title and subtitle as a single string
+    def full_title
+      ret = title.clone
+      ret << " - #{self[:subtitle]}" if self[:subtitle]
+      ret
+    end
+
     def date()    @config[:date].call(self[:date])           end
     def author()  self[:author] || @config[:author]          end
     def to_html() self.load; super(:article, @config)        end

@@ -14,12 +14,6 @@ $:.unshift File.dirname(__FILE__)
 require 'ext/ext'
 
 module Toto
-  Paths = {
-    :templates => "templates",
-    :pages => "templates/pages",
-    :articles => "articles"
-  }
-
   def self.env
     ENV['RACK_ENV'] || 'production'
   end
@@ -30,7 +24,7 @@ module Toto
 
   module Template
     def to_html page, config, &blk
-      path = ([:layout, :repo].include?(page) ? Paths[:templates] : Paths[:pages])
+      path = ([:layout, :repo].include?(page) ? config[:views_path] : config[:pages_path])
       config[:to_html].call(path, page, binding)
     end
 
@@ -111,7 +105,7 @@ module Toto
     end
 
     def article route
-      Article.new("#{Paths[:articles]}/#{route.join('-')}.#{self[:ext]}", @config).load
+      Article.new("#{@config[:articles_path]}/#{route.join('-')}.#{self[:ext]}", @config).load
     end
 
     def /
@@ -143,7 +137,7 @@ module Toto
         elsif route[0] == 'codepath' && route[1] == '1' && route[2] == 'pages' && !route[3].nil?
           code_path_index = route[3].to_i
           if (1..29).include?(code_path_index) && type == :html
-            code_path_article = Article.new("#{Paths[:articles]}/codepath/1/pages/#{code_path_index}.html", @config).load
+            code_path_article = Article.new("#{@config[:articles_path]}/codepath/1/pages/#{code_path_index}.html", @config).load
             code_path_article.merge!({:code_path_index => code_path_index, :code_path_count => 29})
             context[code_path_article, :codepath]
           else
@@ -170,15 +164,16 @@ module Toto
   protected
 
     def http code
-      [@config[:error].call(code), code]
+      [@config[:error].call(@config[:pages_path], code), code]
     end
 
     def articles
-      self.class.articles self[:ext]
+      self.class.articles @config, self[:ext]
     end
 
-    def self.articles ext
-      Dir["#{Paths[:articles]}/*.#{ext}"].sort_by {|entry| File.basename(entry) }
+    # Passing in the config since this is a class method and we need it to get the articles path
+    def self.articles config, ext
+      Dir["#{config[:articles_path]}/*.#{ext}"].sort_by {|entry| File.basename(entry) }
     end
 
     class Context
@@ -187,7 +182,7 @@ module Toto
 
       def initialize ctx = {}, config = {}, path = "/", env = {}
         @config, @context, @path, @env = config, ctx, path, env
-        @articles = Site.articles(@config[:ext]).reverse.map do |a|
+        @articles = Site.articles(@config, @config[:ext]).reverse.map do |a|
           Article.new(a, @config)
         end
 
@@ -222,7 +217,7 @@ module Toto
 
       def to_xml page
         xml = Builder::XmlMarkup.new(:indent => 2)
-        instance_eval File.read("#{Paths[:templates]}/#{page}.builder")
+        instance_eval File.read("#{@config[:views_path]}/#{page}.builder")
       end
       alias :to_atom to_xml
 
@@ -386,6 +381,9 @@ module Toto
 
   class Config < Hash
     Defaults = {
+      :views_path => "views",                               # path to view templates
+      :pages_path => "views/pages",                         # path to pages
+      :articles_path => "articles",                         # path to articles
       :author => ENV['USER'],                               # blog author
       :title => Dir.pwd.split('/').last,                    # site title
       :root => "index",                                     # site index
@@ -401,10 +399,11 @@ module Toto
       :to_html => lambda {|path, page, ctx|                 # returns an html, from a path & context
         ::Haml::Engine.new(File.read("#{path}/#{page}.haml"), :format => :html5, :ugly => true).render(ctx)
       },
-      :error => lambda {|code|                              # The HTML for your error page
-        ::Haml::Engine.new(File.read("templates/pages/#{code}.haml"), :format => :html5, :ugly => true).render(@context)
+      :error => lambda {|path, code|                              # The HTML for your error page
+        ::Haml::Engine.new(File.read("#{path}/#{code}.haml"), :format => :html5, :ugly => true).render(@context)
       }
     }
+
     def initialize obj
       self.update Defaults
       self.update obj
